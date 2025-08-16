@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>管理后台</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+    <style>
+        .layui-form{padding-top:10px;}
+    </style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;">
+
+        <p style="padding:10px 20px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop" style="color:red;">&#xe63d;</i> 加载中...</p>
+    </div>
+
+    <script id="select" type="text/html">
+        <table class="layui-table" >
+
+            <tr>
+
+                <td colspan="10">
+                    <div class="layui-form-item">
+                        <form class="layui-form" onsubmit="return sousuo();">
+
+                            <div class="layui-input-inline" style="width:88px;">
+                                <input type="text" name="SOID" value="{{ SOID }}" id="SOID" placeholder="用户uid" autocomplete="off"  class="layui-input">
+                            </div>
+                            <div class="layui-input-inline" style="width:88px;">
+                                <input type="text" name="text" name="ETART" value="{{ ETART }}" id="ETART" placeholder="开始时间" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-input-inline" style="width:88px;">
+                                <input type="text" name="text" name="JETART" value="{{ JETART }}" id="JETART" placeholder="结束时间" autocomplete="off" class="layui-input">
+                            </div>
+
+                            <button class="layui-btn layui-btn-normal" ><i class="layui-icon">&#xe615;</i> 立即搜索</button>
+
+
+                        </form>
+                    </div>
+                </td>
+
+            </tr>
+
+            <colgroup>
+
+                {{# if( $(window).width() > 700){ }}
+
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+
+                {{# } }}
+
+                <col>
+                <col>
+                <col>
+
+            </colgroup>
+
+            <thead>
+
+            <tr>
+                <th>{{ TYPE[2] }}</th>
+                <th>{{ TYPE[21] }}</th>
+                <th>{{ TYPE[22] }}</th>
+
+                {{# if( $(window).width() > 700){ }}
+
+                <th>{{ TYPE[3] }}</th>
+                <th>{{ TYPE[6] }}</th>
+                <th>{{ TYPE[17] }}</th>
+                <th>{{ TYPE[18] }}</th>
+                <th>{{ TYPE[19] }}</th>
+                <th>{{ TYPE[20] }}</th>
+
+                {{# } }}
+
+            </tr>
+
+            </thead>
+            <tbody>
+
+            {{#  layui.each(d, function(index, item){ }}
+
+            <tr >
+
+                <td>{{ item[2] }}</td>
+                <td>{{ item[21] }}</td>
+                <td>{{ item[22] }}</td>
+
+                {{# if( $(window).width() > 700){ }}
+
+                <td>{{ item[3] }}</td>
+                <td>{{ item[6] }}</td>
+                <td>{{ item[17] }}</td>
+                <td>{{ item[18] }}</td>
+                <td>{{ item[19] }}</td>
+                <td>{{ item[20] }}</td>
+
+
+                {{# } }}
+
+
+            </tr>
+
+            {{# }); }}
+            </tbody>
+        </table>
+
+
+
+
+
+    </script>
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+    var MODE = 'huobiinfo';
+    var NUM = 10;
+    var pg = 1;
+    var quanxin = Array();
+    var ID = 0;
+    var TYPE;
+    var SOl =-1;
+    var SOID = '';
+    var SOSO = '';
+    var ETART = '';
+    var JETART = '';
+    var TONGJIN = 0;
+
+    layui.config({
+        base: '/layui/lay/modules/'
+    });
+
+
+    function sousuo(){
+
+        SOID  = $("#SOID").val();
+        ETART  = $("#ETART").val();
+        JETART  = $("#JETART").val();
+        pg =1;
+
+
+
+        dbselect();
+        return false;
+
+
+
+
+    }
+
+    /*开始时间*/
+    $(document).on('click','#ETART',function () {
+
+        laydate({
+            elem: $('#ETART')[0], //需显示日期的元素选择器
+            event: 'click', //触发事件
+            format: 'YYYY-MM-DD hh:mm:ss', //日期格式
+            istime: true, //是否开启时间选择
+            isclear: true, //是否显示清空
+            istoday: true, //是否显示今天
+            issure: true, //是否显示确认
+            festival: false, //是否显示节日
+            min: '1900-01-01 00:00:00', //最小日期
+            max: '2099-12-31 23:59:59', //最大日期
+            fixed: true, //是否固定在可视区域
+            zIndex: 99999999 //css z-index
+        });
+    });
+
+    /*结束时间*/
+    $(document).on('click','#JETART',function () {
+
+        laydate({
+            elem: $('#JETART')[0], //需显示日期的元素选择器
+            event: 'click', //触发事件
+            format: 'YYYY-MM-DD hh:mm:ss', //日期格式
+            istime: true, //是否开启时间选择
+            isclear: true, //是否显示清空
+            istoday: true, //是否显示今天
+            issure: true, //是否显示确认
+            festival: false, //是否显示节日
+            min: '1900-01-01 00:00:00', //最小日期
+            max: '2099-12-31 23:59:59', //最大日期
+            fixed: true, //是否固定在可视区域
+            zIndex: 99999999 //css z-index
+        });
+
+    });
+
+
+
+    function vwselect(data){
+
+        laytpl = layui.laytpl;
+        element = layui.element();
+        form = layui.form();
+        var tpl = document.getElementById('select').innerHTML;
+        var render = laytpl(tpl).render(data.data);
+        document.getElementById('view').innerHTML = render;
+        element.init();
+
+        form = layui.form();
+
+        form.render('select');
+
+
+    }
+
+
+    function dbselect(){
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:{y:MODE,d:"get",ktime:ETART,jtime:JETART,tuid:SOID,num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    D = data.data;
+                    TYPE = data.data.type;
+
+                    layer.closeAll();
+
+                    vwselect(D);
+
+                }else{
+
+                    layer.msg('没有更多数据');
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+    }
+
+    layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+        var layer = layui.layer,
+                laydate =layui.laydate,
+                upload =layui.upload,
+                form = layui.form();
+        $ = layui.jquery;
+        var laytpl = layui.laytpl;
+        var laypage = layui.laypage;
+
+        dbselect();
+        /*laypage({
+            cont:'page',
+            pages:10000000,
+            skip:false,
+            jump:function(obj,first)
+            {
+                if(!first){
+                    pg = obj.curr;
+                    dbselect();
+                }
+            }
+        });*/
+
+    });
+
+</script>
+
+
+

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+.layui-form{padding-top:10px;}
+</style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;"> 
+    
+        <p style="padding:10px 20px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop" style="color:red;">&#xe63d;</i> 加载中...</p>
+    </div>
+
+    <script id="select" type="text/html">
+    <table class="layui-table" >
+
+        <tr>
+            <td colspan="10"> 
+            <div class="layui-form-item">
+            <form class="layui-form" onsubmit="return sousuo();">
+
+                <div class="layui-input-inline">
+                    <select name="SOl" id="SOl">
+                        <option value="-1" selected="selected">全部游戏</option>
+
+                        {{# layui.each(GAMELIST, function(index, item){ }}
+                             <option value="{{ index }}" {{ SOl == index ?' selected="selected" ':''}} >{{ item }}</option>
+                        {{# }); }}
+
+                    </select>
+                </div>
+                
+                
+                <div class="layui-input-inline" style="width:88px;">
+                    <input type="text" name="text" name="SOSO" value="{{ SOSO }}" id="SOSO"  placeholder="房间ID" autocomplete="off" class="layui-input">
+                </div>  
+                <button class="layui-btn layui-btn-normal" ><i class="layui-icon">&#xe615;</i> 立即搜索</button>
+
+                {{# if(TONGJIN != '0'){ }}
+
+                    <button class="layui-btn layui-btn-danger" ><i class="layui-icon">&#xe62e;</i> {{ TONGJIN }}</button>
+
+                {{# } }}
+                </form>
+             </div>
+            </td>
+         
+        </tr>
+
+        <colgroup>
+
+            {{# if( $(window).width() > 700){ }}
+
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+       
+            {{# } }}
+
+            <col>
+            <col>
+            <col>
+         
+        </colgroup>
+
+        <thead>
+
+            <tr>
+                <th>房间id</th>
+            {{# if( $(window).width() > 700){ }}
+
+                <th>游戏类型</th>
+      
+            {{# } }}
+                <th>期数</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        {{#  layui.each(d, function(index, item){ }}
+  
+            <tr id="tb{{ item.id }}">
+
+            <td>{{ item.fangid }}</td>
+
+                
+                
+
+                {{# if( $(window).width() > 700){ }}
+
+                    
+                    <td>{{ ( GAMELIST[item.gameid] ? GAMELIST[item.gameid] : item.gameid) }}</td>
+
+                  
+                    
+                 
+       
+                {{# } }}
+
+                <td>{{ item.qishu }}</td>
+
+                
+                
+
+                
+
+                <td>
+                    <button class="layui-btn" onclick="edit({{ item.id }});"><i class="layui-icon">&#xe642;</i>详情</button>
+
+                    
+                </td>
+
+            </tr>
+
+        {{# }); }}
+    </tbody>
+</table>
+
+    </script>
+    <div class="baoqi" style="padding:0px 20px;">
+
+        <div id="page" style="float:left;"></div>
+
+    </div>
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+var MODE = 'gamejiu';
+var NUM = 10;
+var pg = 1;
+var quanxin = Array();
+var ID = 0;
+var TYPE;
+
+var GAMELIST;
+
+var SOl = '';
+var SOID = '';
+var SOSO = '';
+var TONGJIN = 0;
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function sousuo(){
+
+    SOl  = $("#SOl").val();
+    SOID  = $("#SOID").val();
+    SOSO  = $("#SOSO").val();
+    pg =1;
+
+
+
+    dbselect();
+    return false;
+
+
+
+
+}
+
+function dbdel(ID){
+
+}
+
+
+function edit(ID){
+
+    html ='<form name="form" id="form" class="layui-form">';
+
+    BIAO = Array(
+
+        'gameid#游戏id#text##游戏id##',
+        'fangid#房间id#text##房间id##',
+        'qishu#当前期数#text##当前期数##',
+        'atime#记录时间#text##创建时间##',
+        'neirong#游戏数据#textarea#height:300px;#游戏详细数据##',
+        'tijiao##tjcz####tijiao'
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    }
+
+    html+="</form>";
+
+    OPID = layer.open({
+        type: 1,
+        title:false,
+        area: ['100%', '100%'],
+        fixed: true, 
+        maxmin: false,
+        content: html
+    });
+
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            if(data.code == 1){
+
+                D = data.data;
+
+                for(var H in D){
+
+                    if(H =='atime' || H == 'stime'){
+
+                        $("[name="+H+"]").val( time(D[H]) );
+                    
+                    
+                    }else if(H =='neirong'){
+
+                        $("[name="+H+"]").val( formatJson(D[H]));
+
+                    }else{
+
+                        $("[name="+H+"]").val(D[H]);
+                    }
+
+                    
+                
+                }
+                form = layui.form();
+                form.render();
+                
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+
+
+
+
+
+    form = layui.form();
+    form.on('submit(tijiao)', function(data){
+     
+       
+
+        dd = {y:MODE,d:"put",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")};
+        obj = $.extend(dd,data.field);
+
+
+        console.log(obj);
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:obj,
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+                    layer.close(OPID);
+                    dbselect();
+
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+        return false;
+    });
+    form.render();
+}
+
+function add(ID){
+
+   
+}
+
+
+
+function vwselect(data){
+
+    laytpl = layui.laytpl;
+    element = layui.element();
+    form = layui.form();
+    var tpl = document.getElementById('select').innerHTML;
+    var render = laytpl(tpl).render(data.data);
+    document.getElementById('view').innerHTML = render;
+    element.init();
+
+    form = layui.form();
+  
+    form.render('select'); 
+    
+ 
+}
+
+
+function dbselect(){
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",level:SOl,tuid:SOID,soso:SOSO,num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            D = data.data;
+
+          
+
+            if (D.gamelist){
+
+                GAMELIST = D.gamelist;
+            }
+
+           
+
+
+            if(data.code == 1){
+
+               
+
+                layer.closeAll();
+                vwselect(D);
+
+            }else{
+
+                layer.msg('没有更多数据');
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+}
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+    var layer = layui.layer,
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    var laytpl = layui.laytpl;
+    var laypage = layui.laypage;
+
+    dbselect();
+    laypage({
+        cont:'page',
+        pages:10000000,
+        skip:false,
+        jump:function(obj,first)
+        {
+            if(!first){
+                pg = obj.curr;
+                dbselect();
+            }
+        }
+    });
+
+});
+
+</script>
+
+
+

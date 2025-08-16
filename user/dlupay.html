@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+.layui-form{padding-top:10px;}
+.bjshse{background:#eef;}
+</style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;"> 
+
+
+    
+    
+    </div>
+
+   
+
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+QT = 2;
+var MODE = 'dlupay';
+var NUM = 8;
+var pg = 1;
+var ID = 0;
+var TYPE;
+var UID = 0;
+var HUOBI;
+var BEILV = 1;
+var BILI = 1;
+var JINE = 0;
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function dbdel(ID){
+
+}
+
+
+function edit(ID){
+
+}
+
+
+function add(ID){
+
+}
+
+function qtdenglu(){
+    
+    layer.closeAll();
+    window.location.href="user.html";
+
+}
+
+function pppay(){
+
+
+    jin = $("[name=jines]").val() ;
+
+    if(jin  > JINE){
+
+    }
+
+    dd = {y:MODE,d:"put",ttoken:TOKEN,uid:UID,jine:jin,apptoken:getCookie("apptoken")};
+
+
+    $.ajax({
+
+        url:USIN,
+        type: "POST",
+        data:dd,
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+                
+                TOKEN = data.token;
+            }
+
+            if(data.code == 1){
+
+                D = data.data;
+                JINE = D.zji;
+
+                $(".yyuande").html(JINE );
+                $(".hyuande").html( D.cji);
+
+            }
+
+            layer.open({
+                title:null,
+              content: '充值成功'
+              ,btn: ['给其他用户充值', '关闭']
+              ,yes: function(index, layero){
+                    dbselect();
+                    layer.closeAll();
+                }
+
+            });
+
+
+
+        
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+
+
+}
+
+function vwselect(D){
+
+
+    if(D.bizhong){
+    
+        HUOBI = D.bizhong;
+    }
+
+
+ 
+
+    if(D.uid){
+
+       UID = D.uid;
+    }
+
+ 
+ 
+
+   JINE = D.uijine;
+    
+
+    html = '<table class="layui-table"><colgroup><col width="150"><col></colgroup><thead><tr><th>属性</th><th>信息</th></tr></thead><tbody>';
+    
+    
+    html += '<tr><td>会员UID</td><td>'+D.uid+'</td></tr>';
+    html += '<tr><td>会员昵称</td><td>'+D.uname+'</td></tr>';
+    html += '<tr><td>会员头像</td><td><img src="'+D.touxiang+'" style="width:50px;height:50px;"></td></tr>';
+    html += '<tr><td>会员'+HUOBI[1]+'</td><td><span class="hyuande">'+D.jifen+'</span>点</td></tr>';
+
+    html += '<tr><td>你的'+HUOBI[1]+'</td><td><span class="yyuande">'+D.uijine+'</span> </td></tr>';
+
+    html += '<tr><td>输入充值'+HUOBI[1]+'</td><td><input type="text" name="jines" lay-filter="filter" value="1" placeholder="请输入给会员充值的房卡" class="layui-input"/></td></tr>';
+
+    html += '<tr><td><a href="javascript:dbselect();" class="layui-btn">给其他人充值</a></td><td><a href="javascript:pppay();" class="layui-btn layui-btn-danger">立即充值</a></td></tr>';
+
+    html += '</tbody></table>';
+
+    $("#view").html(html);
+
+    form = layui.form();
+
+    $("[name=jines]").bind('input propertychange',function(){
+
+        jine = parseInt($(this).val());
+
+        if(isNaN(jine)){
+
+            jine = 1;
+        
+        
+        }else if(jine < 1){
+
+            $(this).val(1);
+        
+            jine = 1;
+
+        }else if(jine > D.uijine){
+
+
+             $(this).val(D.uijine);
+
+
+
+            jine =  D.uijine;
+
+
+
+
+        
+        
+        }
+
+    });
+
+    
+
+    form.render();
+
+
+    
+
+
+
+}
+
+
+function anniu(){
+
+    var user = $("[name=uid]").val();
+    if(user.length < 1){
+
+
+            layer.msg('请输入会员UID');
+
+            return false;
+        
+        }
+
+      
+        dd = {y:MODE,d:"get",ttoken:TOKEN,uid:user,apptoken:getCookie("apptoken")};
+ 
+
+        $.ajax({
+
+            url:USIN,
+            type: "POST",
+            data:dd,
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    vwselect(data.data);
+
+                }
+
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+
+        return false;
+
+
+}
+
+function dbselect(){
+
+   
+
+    html ='<form class="layui-form layui-form-pane"><div class="layui-form-item "><label class="layui-form-label">请输入UID</label><div class="layui-input-block"><input type="text" name="uid" autocomplete="off" placeholder="请输入你要给充值的会员UID" class="layui-input"></div><div class="layui-form-item" style="margin-top:20px;"><div class="layui-input-block"><button class="layui-btn"  onclick="return anniu()">核对会员信息</button></div></div> </form>';
+
+    $("#view").html(html);
+
+
+}
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+    var layer = layui.layer,
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+   
+
+    dbselect()
+
+ 
+
+});
+
+</script>
+
+
+

@@ -1,0 +1,28 @@
+<?php return array (
+  0 => 'id,name,tupian,tupianji,jieshao,serverlist,biaoshi,renshu,huobi,fangka,off,stjushu,strenshu,stdifen,stzhfen,stkuozan,shops,atime,ctime,adminid,ip,koufang',
+  1 => 
+  array (
+    'id' => 'auto_increment',
+    'name' => 'name_',
+    'tupian' => 'tupian_',
+    'tupianji' => 'tupianji_',
+    'jieshao' => 'jieshao_',
+    'serverlist' => 'serverlist_',
+    'biaoshi' => 'biaoshi_',
+    'renshu' => 'renshu_0',
+    'huobi' => 'huobi_0',
+    'fangka' => 'fangka_0.00',
+    'off' => 'off_0',
+    'stjushu' => 'stjushu_',
+    'strenshu' => 'strenshu_',
+    'stdifen' => 'stdifen_',
+    'stzhfen' => 'stzhfen_',
+    'stkuozan' => 'stkuozan_',
+    'shops' => 'shops_',
+    'atime' => 'atime_0',
+    'ctime' => 'ctime_0',
+    'adminid' => 'adminid_0',
+    'ip' => 'ip_',
+    'koufang' => 'koufang_0',
+  ),
+);

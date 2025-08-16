@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+.layui-form{padding-top:10px;}
+#view button{margin-bottom:10px;}
+span.gg{display:inline-block;padding:0 5px;color:red;background:#fff;border:1px solid #ccc;border-radius:30%;}
+.layui-bg-b1{background-color: #DDF0ED;}
+.layui-bg-b2{background-color: #376956;}
+.layui-bg-b3{background-color: #C3BED4;}
+.layui-bg-b4{background-color: #C7FFEC;}
+.layui-bg-b5{background-color: #495A80;}
+.layui-bg-b7{background-color: #E9F01D;}
+.layui-bg-b8{background-color: #9966CC;}
+.layui-bg-b9{background-color: #00FF80;}
+.layui-bg-b10{background-color: #FD5B78;}
+</style>
+
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;"> 
+
+        <button class="layui-btn layui-btn-primary" onclick="edit(1);">今日充值</button>
+        <button class="layui-btn" onclick="edit(2);">七天充值</button>
+        <button class="layui-btn layui-btn-normal" onclick="edit(3);">所有充值</button>
+        <button class="layui-btn layui-btn-warm" onclick="edit(5);">30天房卡记录</button>
+        <button class="layui-btn layui-btn-danger" onclick="edit(6);">30天注册统计</button>
+    
+        
+    </div>
+
+    
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+var MODE = 'tongji';
+var NUM = 10;
+var pg = 1;
+var quanxin = Array();
+var ID = 0;
+var TYPE;
+
+var GAMELIST;
+
+var SOl = '';
+var SOID = '';
+var SOSO = '';
+var TONGJIN = 0;
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function sousuo(){
+
+}
+
+function dbdel(ID){
+
+}
+
+
+function edit(ID){
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            if(data.code == 1){
+
+                D = data.data.data;
+
+                html = '<form class="layui-form" action="">';
+
+                gao = data.data.gao;
+
+                if(gao< 1){
+
+                    gao = 1;
+                
+                }
+
+                Titel ={ 1:"今日充值",2:"七天充值",3:"所有充值",5:"30天房卡记录",6:"30天注册统计"}
+
+                COLOR = Array('layui-bg-red','layui-bg-orange','layui-bg-green','layui-bg-blue','layui-bg-cyan','layui-bg-b1','layui-bg-b2','layui-bg-b3','layui-bg-b4','layui-bg-b5','layui-bg-b6','layui-bg-b7','layui-bg-b8','layui-bg-b9','layui-bg-b10');
+              
+
+
+                for(var m in D){
+
+
+                    html+='<div class="layui-form-item"><label class="layui-form-label">'+D[m].k+'</label><div class="layui-input-block">';
+
+                    $zhi = D[m].v/gao*100;
+     
+                    html+='<div class="layui-progress layui-progress-big" style="width:90%;top:10px;">';
+                    html+='<div class="layui-progress-bar '+COLOR[Math.floor(Math.random()*COLOR.length)]+'" lay-percent="'+$zhi+'%"><span class="gg">'+D[m].v+'</span></div>';
+
+                    html+='</div></div></div>';
+                }
+
+                 html+='</form>';
+
+                OPID = layer.open({
+                    type: 1,
+                    title:Titel[ID],
+                    area: ['100%', '100%'],
+                    fixed: true, 
+                    maxmin: false,
+                    content: html
+                });
+
+                form = layui.form();
+  
+                form.render(); 
+
+
+
+
+                
+                element = layui.element();
+                element.init();
+                
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+
+}
+
+function add(ID){
+
+   
+}
+
+
+
+function vwselect(data){
+
+    
+    
+ 
+}
+
+
+function dbselect(){
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",level:SOl,tuid:SOID,soso:SOSO,num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+
+            if(data.code == 1){
+
+               
+
+                layer.closeAll();
+              
+
+            }else{
+
+                layer.msg('没有更多数据');
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+}
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+    var layer = layui.layer,
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    dbselect();
+
+
+});
+
+</script>
+
+
+

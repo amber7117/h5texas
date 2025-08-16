@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>战绩</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+
+<style>
+.layui-form{padding-top:10px;}
+html{width:95%;height:95%;background:#743c3f;}
+body{background:#743c3f;font-size:28px;width:100%;height:100%;color:#fff;}
+.baoqi{display:none;}
+.renfen{text-align:left;}
+.renfen span{display:block;width:96%;color:#5F1300;text-align:left;padding:5px;background:#FEEBB3;margin-bottom:2px;}
+.renfen span b{display:inline-block;float:right;margin-right:18px;color:#00FF00;}
+
+.layui-table{background:#FFF3C9;}
+.layui-table tbody{margin-top:40px;}
+.layui-table td, .layui-table th{border: 1px solid #FEEBB3;}
+.layui-table th{background:#691900;font-weight:normal;font-size:12px;color:#eee;text-align:center;color:#fff;}
+.layui-table td{font-size:12px;padding:0px;text-align:center;}
+.yingjia{color:#00FF00;}
+.shujia{color:#CCCCCC;}
+.layui-table tr:hover, .layui-table[lay-even] tr:nth-child(even){background:transparent;}
+.mmm {width:100%;position:fixed;top:0px;background:#691900;height:38px;line-height:38px;border-bottom:1px solid #691900;color:#fff;}
+thead th{width:10%;}
+.mmm div{float:left;text-align:center;}
+.layui-flow-more{width:50px;margin:0 auto;text-align:center;display:block;}
+.layui-flow-more a {width:50px;margin:0 auto;display:block;}
+</style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:0px;"> 
+    <div class="mmm">
+   
+
+                <div style="width:20%;">结果</div>
+                <div style="width:20%;">房间号</div>
+                <div style="width:40%;">分数</div>
+                <div style="width:20%;">时间</div>
+
+        
+    </div>
+     <table class="layui-table" border=1 style="padding:0px;margin:0px; border-collapse:collapse;margin-top:40px;" >
+        <colgroup>
+            <col style="width:20%;">
+            <col style="width:20%;">
+            <col style="width:40%;">
+            <col style="width:20%;">
+         
+        </colgroup>
+            <tbody  id="zhongneirong">
+      
+ 
+           
+
+            </tbody>
+        </table>
+    
+
+    </div>
+
+    <script id="select" type="text/html">{{#  layui.each(d, function(index, item){ }}<tr id="tb"><td>  {{# if(item.ufen == 0){ }}<span class="yingjia">平手</span>{{# }else if(item.ufen > 0){ }}<span class="yingjia">赢家</span>{{# }else{ }}<span class="shujia">输家</span> {{# } }}</td><td>{{ item.fangid }}</td><td> <div class="renfen">{{#  layui.each(item.user, function(index2, item2){}}  <span>{{ item2.name }} <b> {{# if(item2.fen > 0){ }} <em style="color:red;">+{{ item2.fen }}</em>{{# }else{ }} {{ item2.fen}}{{# } }}</b></span>{{# }); }}</div></td> <td>{{ time(item.atime) }}</td> </tr> {{# }); }}</script>
+
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+if($_GET['apptoken']){
+
+    setCookie('apptoken',$_GET['apptoken']);
+
+}
+
+
+QT = 2;
+var UID = 0;
+var MODE = 'zhanji';
+var NUM = 8;
+var pg = 1;
+var ID = 0;
+var GAME;
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function dbdel(ID){
+
+}
+
+
+function edit(ID){
+
+  
+
+
+}
+
+function qtdenglu(){
+    
+    layer.closeAll();
+    window.location.href="/user.html";
+
+}
+
+function add(ID){
+
+}
+
+
+
+function vwselect(data){
+
+    laytpl = layui.laytpl;
+    element = layui.element();
+    form = layui.form();
+    var tpl = document.getElementById('select').innerHTML;
+    var render = laytpl(tpl).render(data.data);
+
+    return render;
+
+    $("#zhongneirong").append(render);
+   
+    element.init();
+
+    form = layui.form();
+    form.render('select'); 
+
+}
+
+
+function dbselect(next){
+
+    $.ajax({
+
+        url:USIN,
+        type: "POST",
+        data:{y:MODE,d:"get",num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            D = data.data;
+
+        
+
+            if (D.game)
+            {
+                GAME = D.game;
+            }
+
+            if(data.code == 1){
+
+                $(".baoqi").show();
+
+                   var lis = [];
+
+                lis.push(vwselect(D));
+
+                layer.closeAll();
+                
+                next(lis.join(''), true); 
+                $(".layui-flow-more").html(' ');
+
+
+
+            }else{
+                $(".layui-flow-more").hide();
+
+                layer.msg('目前没有更多战绩');
+                
+
+            }
+
+        },error:function(XMLHttpRequest){
+
+            
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+}
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate','flow'], function(){
+
+    var layer = layui.layer,
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    var flow = layui.flow;
+    var laytpl = layui.laytpl;
+    var laypage = layui.laypage;
+
+   
+    flow.load({
+    elem: '#zhongneirong' //流加载容器
+
+    ,isAuto:true
+    
+    ,mb:100
+    
+    ,done: function(page, next){ //加载下一页
+
+        pg = page;
+
+      
+      dbselect(next);
+      
+    }
+  });
+
+  
+
+
+
+});
+
+</script>

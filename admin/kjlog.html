@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>管理后台</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+    <style>
+        .layui-form{padding-top:10px;}
+    </style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;">
+
+        <p style="padding:10px 20px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop" style="color:red;">&#xe63d;</i> 加载中...</p>
+    </div>
+
+    <script id="select" type="text/html">
+        <table class="layui-table" >
+
+            <tr>
+
+                <td colspan="10">
+                    <div class="layui-form-item">
+                        <form class="layui-form" onsubmit="return sousuo();">
+
+                            <div class="layui-input-inline" style="width:88px;">
+                                <input type="text" name="SOID" value="{{ SOID }}" id="SOID" placeholder="期数" autocomplete="off"  class="layui-input">
+                            </div>
+                            <button class="layui-btn layui-btn-normal" ><i class="layui-icon">&#xe615;</i> 立即搜索</button>
+
+                            {{# if(TONGJIN != '0'){ }}
+
+                            <button class="layui-btn layui-btn-danger" ><i class="layui-icon">&#xe62e;</i> {{ TONGJIN }}</button>
+
+                            {{# } }}
+                        </form>
+                    </div>
+                </td>
+
+            </tr>
+
+            <colgroup>
+
+                {{# if( $(window).width() > 700){ }}
+
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+
+                {{# } }}
+
+                <col>
+                <col>
+                <col>
+
+            </colgroup>
+
+            <thead>
+
+            <tr>
+                <th>ID</th>
+                <th>庄家数组</th>
+                <th>闲家数组</th>
+
+                {{# if( $(window).width() > 700){ }}
+
+                <th>游戏期数</th>
+                <th>时间</th>
+
+                {{# } }}
+
+
+
+            </tr>
+
+            </thead>
+            <tbody>
+
+            {{#  layui.each(d, function(index, item){ }}
+
+            <tr id="tb{{ item.vk_id }}">
+
+                <td>{{ item.vk_id }}</td>
+                <td>{{ item.vk_dealer }}</td>
+                <td>{{ item.vk_player }}</td>
+
+                {{# if( $(window).width() > 700){ }}
+
+                <td>{{ item.vk_qishu }}</td>
+                <td>{{ item.vk_time }}</td>
+
+                {{# } }}
+
+            </tr>
+
+            {{# }); }}
+            </tbody>
+        </table>
+
+
+
+
+
+    </script>
+    <div class="baoqi" style="padding:0px 20px;">
+
+        <button class="layui-btn layui-btn-normal  layui-btn-small" onclick="add();" style="float:left;margin-right:18px;margin-top:10px;"><i class="layui-icon">&#xe654;</i> 新建 </button>
+        <div id="page" style="float:left;"></div>
+
+    </div>
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+    var MODE = 'kjlog';
+    var NUM = 10;
+    var pg = 1;
+    var quanxin = Array();
+    var ID = 0;
+    var TYPE;
+    var SOl =-1;
+    var SOID = '';
+    var SOSO = '';
+    var TONGJIN = 0;
+
+    layui.config({
+        base: '/layui/lay/modules/'
+    });
+
+
+    function sousuo(){
+
+        SOl  = $("#SOl").val();
+        SOID  = $("#SOID").val();
+        SOSO  = $("#SOSO").val();
+        pg =1;
+
+
+
+        dbselect();
+        return false;
+
+
+
+
+    }
+
+    function dbdel(ID){
+
+    }
+
+
+    function edit(ID){
+
+        html ='<form name="form" id="form" class="layui-form">';
+        BIAO = Array(
+
+                'name#用户昵称#text##用户昵称##required',
+                'off#状态#select##OFF',
+
+                'qdtime#签到时间#text##',
+                'tijiao##tjcz###立即修改#tijiao'
+        );
+
+        for(var z in BIAO){
+
+            html+=jsfrom(BIAO[z]);
+        }
+
+        html+="</form>";
+
+        OPID = layer.open({
+            type: 1,
+            title:false,
+            area: ['100%', '100%'],
+            fixed: true,
+            maxmin: false,
+            content: html
+        });
+
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:{y:MODE,d:"get",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    D = data.data;
+
+                    for(var H in D){
+
+                        if(H =='bet_time'){
+
+                            $("[name="+H+"]").val( time(D[H]) );
+
+
+                        }else{
+
+                            $("[name="+H+"]").val(D[H]);
+                        }
+
+
+
+                    }
+                    form = layui.form();
+                    form.render();
+
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+        form = layui.form();
+
+
+        form.render();
+    }
+
+    function add(ID){
+
+
+    }
+
+
+
+    function vwselect(data){
+
+        laytpl = layui.laytpl;
+        element = layui.element();
+        form = layui.form();
+        var tpl = document.getElementById('select').innerHTML;
+        var render = laytpl(tpl).render(data.data);
+        document.getElementById('view').innerHTML = render;
+        element.init();
+
+        form = layui.form();
+
+        form.render('select');
+
+
+    }
+
+
+    function dbselect(){
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:{y:MODE,d:"get",level:SOl,vk_qishu:SOID,soso:SOSO,num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    D = data.data;
+
+                    layer.closeAll();
+
+                    if(D.type){
+
+                        TYPE = D.type;
+                    }
+
+                    if(D.jine){
+
+                        TONGJIN = D.jine;
+
+                    }else{
+
+                        TONGJIN = 0;
+                    }
+
+
+                    vwselect(D);
+
+                }else{
+
+                    layer.msg('没有更多数据');
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+    }
+
+    layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+        var layer = layui.layer,
+                laydate =layui.laydate,
+                upload =layui.upload,
+                form = layui.form();
+        $ = layui.jquery;
+        var laytpl = layui.laytpl;
+        var laypage = layui.laypage;
+
+        dbselect();
+        laypage({
+            cont:'page',
+            pages:10000000,
+            skip:false,
+            jump:function(obj,first)
+            {
+                if(!first){
+                    pg = obj.curr;
+                    dbselect();
+                }
+            }
+        });
+
+    });
+
+</script>
+
+
+

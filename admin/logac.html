@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+
+
+.layui-input, .layui-textarea{width:80%;}
+@media screen and (max-width: 450px){
+.layui-form-item .layui-input-inline{margin-left:5px;}
+
+}
+
+
+</style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;"> 
+    
+        <p style="padding:10px 20px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop" style="color:red;">&#xe63d;</i> 加载中...</p>
+    </div>
+
+    <script id="select" type="text/html">
+    <table class="layui-table" >
+      <colgroup>
+
+       {{# if( $(window).width() > 700){ }}
+        <col width="80">
+        
+        <col>
+       
+        <col width="150">
+        <col width="200">
+
+        {{# } }}
+        
+        <col>
+        <col>
+         
+      </colgroup>
+    <thead>
+        <tr>
+        {{# if( $(window).width() > 700){ }}
+            <th>ID</th>
+        {{# } }}
+            <th>菜单名字</th>
+
+        {{# if( $(window).width() > 700){ }}
+
+            <th>菜单标识</th>
+
+        {{# } }}
+
+            <th>操作</th>
+        </tr>
+        
+    </thead>
+    <tbody>
+    {{#  layui.each(d, function(index, item){ }}
+  
+    <tr id="tb{{ item.id }}">
+
+        {{# if( $(window).width() > 700){ }}
+
+            <td>{{ item.id }}</td>
+
+        {{# } }}
+
+        <td>{{ item.name }}</td>
+
+        {{# if( $(window).width() > 700){ }}
+
+            <td>{{ item.type }}</td>
+
+        {{# } }}
+
+
+    
+        <td>
+            <button class="layui-btn" onclick="edit({{ item.id }});"><i class="layui-icon">&#xe642;</i> 编辑</button>
+            <button class="layui-btn layui-btn-danger  layui-btn-small" onclick="dbdel({{ item.id }});"><i class="layui-icon">&#xe640;</i> 删除</button>
+
+        </td>
+
+    </tr>
+    {{# }); }}
+  
+  </tbody>
+</table>
+
+
+    
+
+
+    </script>
+    <div class="baoqi" style="padding:0px 20px;">
+
+        <button class="layui-btn layui-btn-normal  layui-btn-small" onclick="add();" style="float:left;margin-right:18px;margin-top:10px;"><i class="layui-icon">&#xe654;</i> 新建 </button>
+        
+        
+        <div id="page" style="float:left;"></div>
+
+    </div>
+
+</div>
+
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+var NUM = 10;
+var pg = 1;
+var quanxin = Array();
+var ID = 0;
+var MODE = 'logac';
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function dbdel(ID){
+
+    /*删除数据*/
+
+    layer.confirm('确定删除?', {icon: 3, title:'提示'}, function(index){
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:{y:MODE,d:"delete",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    $("#tb"+ID).remove();
+                    layer.close(index);
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+        });
+
+    });
+}
+
+function edit(ID){
+
+ 
+    html ='<form name="form" id="form" class="layui-form">';
+    
+
+
+    $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:{y:MODE,d:"get",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    D = data.data;
+
+                    
+
+                    if(D.data){
+
+                        quanxin = D.data;
+                    
+                    }
+
+                    BIAO = Array(
+        'name#菜单名字#text##菜单名字##required',
+        'type#菜单分类#text##菜单分类##required',
+
+        'data#菜单类型#caidan#菜单##quanxin',
+        
+        'tijiao##tjcz###立即修改#tijiao'
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    
+    }
+
+    html+="</form>";
+
+        OPID = layer.open({
+        type: 1,
+        title:false,
+        area: ['100%', '100%'],
+        fixed: true, 
+        maxmin: false,
+        content: html
+        });
+
+    for(var H in D){
+
+                        $("[name="+H+"]").val(D[H]);
+                    
+                    }
+
+
+                    form = layui.form();
+                    form.render();
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+
+
+    form = layui.form();
+    form.on('submit(tijiao)', function(data){
+     
+       
+
+        dd = {y:MODE,d:"put",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")};
+        obj = $.extend(dd,data.field);
+
+
+        console.log(obj);
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:obj,
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+                    layer.close(OPID);
+                    dbselect();
+
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+        return false;
+    });
+    form.render();
+
+
+}
+
+function add(ID){
+
+    /*新建数据
+    0 name
+    1 title提示标题
+    2 type类型
+    3 css 样式
+    4 type内部提示
+    5 默认值值
+    6 UI特殊操作
+
+    
+    */
+    
+    
+   
+
+    html ='<form name="form" id="form" class="layui-form">';
+    BIAO = Array(
+        'name#菜单名字#text##菜单名字##required',
+        'type#菜单分类#text##菜单分类##required',
+        'data#菜单类型#caidan#菜单##quanxin',
+        'tijiao##tjcz###立即增加#tijiao'
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    
+    }
+
+
+
+    html+="</form>";
+
+    OPID = layer.open({
+            type: 1,
+            title:false,
+            area: ['100%', '100%'],
+            fixed: true, 
+            maxmin: false,
+            content: html
+    });
+
+
+    form = layui.form();
+
+
+    form.on('submit(tijiao)', function(data){
+     
+       
+
+        dd = {y:MODE,d:"post",ttoken:TOKEN,apptoken:getCookie("apptoken")};
+        obj = $.extend(dd,data.field);
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:obj,
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+                    layer.close(OPID);
+                    dbselect();
+
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+        return false;
+    });
+
+    form.render();
+}
+
+
+
+function vwselect(data){
+
+    laytpl = layui.laytpl;
+    element = layui.element();
+   
+
+    var tpl = document.getElementById('select').innerHTML;
+
+    var render = laytpl(tpl).render(data);
+    document.getElementById('view').innerHTML = render;
+    element.init();
+ 
+}
+
+
+function dbselect(){
+
+    $(".baoqi").show();
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            if(data.code == 1){
+
+                D = data.data;
+
+                layer.closeAll();
+                vwselect(D);
+
+            }else{
+
+                layer.msg('没有更多数据');
+            }
+
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+
+    
+
+
+
+}
+
+
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+
+    var layer = layui.layer,
+ 
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    var laytpl = layui.laytpl;
+    var laypage = layui.laypage;
+
+  
+    dbselect();
+    laypage({
+    cont: 'page'
+  
+    ,pages: 10000000
+    ,skip: false
+    ,jump: function(obj, first){
+            if(!first){
+
+                pg = obj.curr;
+                dbselect();
+            }
+           
+        }
+    });
+
+
+});
+
+</script>
+
+
+

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>会员中心</title>
+  <link rel="stylesheet" href="/layui/css/layui.css">
+  <style>
+  .layui-word-aux{padding-left:20px;}
+  .layui-form-item{margin-bottom:8px;}
+  .layui-word-aux{font-size:14px;color:#009688;white-space:nowrap;}
+  .layui-layout-admin{display:none;}
+  #veiw{padding:10px 30px 10px 0px;max-width:588px;margin:0 auto;}
+  .login{padding-left:30px;text-align:center;display:inline-block;}
+  .login img{width:50px;height:50px;}
+  .ucaidan li{margin-bottom:10px;clear:both;}
+  .ucaidan li .layui-btn{margin:0px 1px 0px 0px;}
+  .layui-btn i{width:28px;display:inline-block;}
+  .utouxiang_v img{border:1px solid #009688;border-radius:50%;background:#fff;}
+   .layui-form-label{width:60px;}
+   .umsgbox_v span{color:Red;display:inline-block;height:20px;line-height:20px;padding:0px 6px;border:1px solid #eef;border-radius:50%;background:#ffe;margin-left:10px;}
+
+   body{height:100%; background-attachment: fixed;background-size:10%;}
+
+   .xinshou,.isdaili{display:none;}
+
+    @media screen and (min-width: 750px) {
+    
+        body{background-position:center 80%;}
+    }
+
+    .bushidailis{ display:none; }
+
+  </style>
+</head>
+<style>
+ .layui-layer-page .layui-layer-content{padding:8px 6px 0px 6px;}
+ .ucaidan{display:none;}
+
+ </style>
+<body>
+<div id="veiw">
+    <ul class="ucaidan">
+        <li>
+            <button class="layui-btn utouxiang_n" onclick="call_main('utouxiang');"> 
+                <i class="layui-icon">&#xe650;</i> 我的头像 
+            </button>
+            
+            <div class="login utouxiang_v" onclick="call_main('utouxiang');">
+
+                <img src="/game/wangya.png" />
+            
+            </div>
+
+        </li>
+
+        <li>
+            <button class="layui-btn uuid_n"> 
+                <i class="layui-icon ">&#xe612;</i> 推广 ID 
+            </button>
+            <button class="layui-btn layui-btn-primary  uuid_v">
+                loading...
+            </button>
+        </li>
+
+         
+        <li>
+            <button class="layui-btn unicehng_n"> 
+                <i class="layui-icon">&#xe60b;</i> 我的帐号 
+            </button>
+            <button class="layui-btn layui-btn-primary unicehng_v" >
+                loading...
+            </button>
+        </li>
+
+        <li>
+            <button class="layui-btn ufangka_n"  onclick="call_main('ufangka');" > 
+                <i class="layui-icon">&#xe606;</i> 我的房卡 
+            </button>
+            <button class="layui-btn layui-btn-primary ufangka_v" onclick="call_main('ufangka');">
+                loading...
+            </button>
+
+           
+        </li>
+
+       
+
+
+
+
+        
+
+        
+        <li>
+            <button class="layui-btn usex_n"  onclick="call_main('usex');">
+                <i class="layui-icon">&#xe62c;</i> 我的性别 
+            </button>
+            <button class="layui-btn layui-btn-primary usex_v" onclick="call_main('usex');">
+                loading...
+            </button>
+        </li>
+
+
+
+        <li>
+            <button class="layui-btn umsgbox_n" onclick="call_main('umsgbox');" >  
+                <i class="layui-icon">&#xe645;</i> 我的消息 
+            </button>
+            <button class="layui-btn layui-btn-primary  umsgbox_v" onclick="call_main('umsgbox');" >
+                点击查看<span>loading...</span>
+            </button>
+        </li>
+
+        
+
+        <li>
+            <button class="layui-btn ugamelist_n"  onclick="call_main('ugamelist');"> 
+                <i class="layui-icon">&#xe60a;</i> 游戏记录 
+            </button> 
+            <button class="layui-btn layui-btn-primary ugamelist_v" onclick="call_main('ugamelist');">
+                点击查看
+            </button>
+        </li>
+
+
+        <li class="bushidailis">
+            <button class="layui-btn ulevel_n" onclick="call_main('dlupay');"> 
+                <i class="layui-icon">&#xe61c;</i> 会员充值
+            </button>
+            <button class="layui-btn layui-btn-primary" onclick="call_main('dlupay');">
+                给会员充值
+            </button>
+        </li>
+
+
+
+        <li>
+            <button class="layui-btn ulevel_n" onclick="call_main('dlmyuser');"> 
+                <i class="layui-icon">&#xe613;</i> 我的会员
+            </button>
+            <button class="layui-btn layui-btn-primary"onclick="call_main('dlmyuser');" >
+                查看我推广的会员
+            </button>
+        </li>
+
+
+        <li >
+            <button class="layui-btn ulevel_n"  onclick="call_main('dtuiguang');"> 
+                <i class="layui-icon">&#xe62c;</i> 推广统计
+            </button>
+            <button class="layui-btn layui-btn-primary" onclick="call_main('dtuiguang');" >
+                我的推广统计
+            </button>
+        </li>
+
+
+
+
+        
+
+        <li>
+            <button class="layui-btn uquite_n" onclick="call_main('uquite');"> 
+                <i class="layui-icon">&#xe614;</i> 帐号退出
+            </button>
+            <button class="layui-btn layui-btn-primary  uquite_v" onclick="call_main('uquite');">
+                点击退出帐号
+            </button>
+        </li>
+
+    </ul>
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script>
+QT = 2;
+/*缓存用户uid*/
+var UID = 0;
+var GENG;
+var FANGka ='房卡';
+var XINGBIE = -1;
+var DINGSHI;
+var TIMEOUT = 60;
+var DJSUO = 1;
+var PAYS;
+
+var PPTYPE;
+var PPJINE =100;
+
+function dlmyuser(){
+
+    /*我的会员*/
+    openmue('我的会员','user/dlmyuser.html');
+
+}
+
+
+function dlupay(){
+
+    /*代理的充值*/
+
+    openmue('代理代充值','user/dlupay.html');
+
+
+}
+
+
+function dtuiguang(){
+
+    /*我的推广统计*/
+
+    openmue('推广统计','user/dtuiguang.html');
+
+}
+
+
+function openmue(title,url){
+
+   index = layer.open({
+        type: 2,
+        title:title,
+        area: ['100%', '100%'],
+        fixed: true, 
+        maxmin: true,
+        content: url,
+        min:function(e){
+
+            layer.iframeSrc(index, url);
+            
+
+            return false;
+        
+        },full:function(e){
+            layer.iframeSrc(index, url);
+
+            return false;
+        
+        },cancel: function(index, layero){
+        
+            qtinmain();
+        }
+    });
+
+
+}
+
+
+layui.config({
+    base: '/layui/lay/modules/'
+});
+
+xinbie = {"-1":"还未选择请选择","0":"女","1":"男"}
+
+function ujiexi(D){
+
+    UID = D.uid;
+
+    $(".uuid_v").html(D.uid);
+ 
+   
+   $(".unicehng_v").html(D.zhanghao);
+
+   PAYS = D.pay;
+
+    if(D.tuid > 0){
+
+    /*代理存在*/
+   
+    $(".xinshou").hide();
+
+       
+
+    }else{
+
+        $(".xinshou").show();
+
+    }
+
+    if(D.level > 0){
+
+        $(".xinshou").hide();
+
+        $(".isdaili").show();
+        $(".bushidailis").show();
+
+    }else{
+
+        $(".isdaili").hide();
+    }
+
+
+    XINGBIE = D.xingbie;
+
+    $(".usex_v").html(xinbie[D.xingbie]);
+    $(".ufangka_v").html(D.jifen);
+
+    FANGka =D.jinfenx;
+
+    $(".ufangka_n").html("<i class=\"layui-icon\">&#xe606;</i> 我的"+FANGka);
+
+    if(D.msgbox > 0){
+
+        $(".umsgbox_v span").show();
+   
+    }else{
+    
+        $(".umsgbox_v span").hide();
+    }
+
+    $(".umsgbox_v span").html(D.msgbox);
+
+    $(".utouxiang_v img").attr({src:D.touxiang});
+
+    if(D.gengduo){
+   
+        GENG = D.gengduo;
+    }
+}
+
+
+function utouxiang(){
+
+    /*用户头像*/
+    html = '<link rel="stylesheet" href="/layui/lay/modules/webuploader.css"><script src="/layui/lay/modules/jquery-3.2.1.min.js"><\/script><script src="/layui/lay/modules/webuploader.js"><\/script><buttom id="up"><i class="layui-icon">&#xe60d;</i> 请点击这里上传头像</buttom>';
+
+    layer.open({
+         type: 1,
+        title:false,
+       
+        closeBtn: 0,
+        anim: 2,
+        shadeClose: true, 
+        content: html,success: function(layero, index){
+
+            var uploader = WebUploader.create({
+                auto: true,
+                server:HTTP+'update.php?&uplx=image&touxiang=1&apptoken='+getCookie("apptoken"),
+                pick: "#up",
+                resize: true,
+                fileVal :"image",
+                compress:{
+                    width: 100,
+                    height: 100,
+
+                    quality: 80,
+
+
+                    allowMagnify: false,
+
+
+                    crop: true,
+
+                    preserveHeaders: false,
+
+
+                    noCompressIfLarger: false,
+
+
+                    compressSize:0
+                }
+            });
+
+            uploader.on( "uploadError",function(){
+                layer.msg("上传失败");
+            });
+
+            uploader.on( "uploadSuccess", function( file,response ) { 
+
+                if(response.code == 1){ 
+
+                    layer.closeAll();
+                    $(".utouxiang_v img").attr({"src":response.msg});
+
+                }else if(response.code == -1){
+
+                   layer.msg(response.msg); 
+                } 
+            });
+        }
+    });
+}
+
+function unicehng(){
+    /*用户昵称*/
+
+    layer.prompt({title: '请输入你的新昵称'},function(value, index, elem){
+
+        $.ajax({
+
+            url:USIN,
+            type: "POST",
+            data:{y:"user",d:"put",lx:1,name:value,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                apptoken = getCookie("apptoken");
+
+                if(!apptoken || apptoken.lenght < 62){
+
+                    if(data.data.apptoken) setCookie("apptoken",data.data.apptoken);
+                }
+
+                $(".unicehng_v").html(value);
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+        });
+
+        layer.close(index);
+
+    });
+
+}
+
+
+function usexdo(sex){
+
+    /*性别设置*/
+
+    $.ajax({
+
+            url:USIN,
+            type: "POST",
+            data:{y:"user",d:"put",lx:2,sex:sex,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                apptoken = getCookie("apptoken");
+
+                if(!apptoken || apptoken.lenght < 62){
+
+                    if(data.data.apptoken) setCookie("apptoken",data.data.apptoken);
+                }
+
+                $(".usex_v").html(xinbie[sex]);
+                layer.closeAll();
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+        });
+
+
+}
+
+function usex(){
+
+    /*用户性别*/
+
+    if( XINGBIE != -1){
+    
+        layer.msg("性别已经选择");
+
+    }else{
+
+
+        layer.msg('请选择你的性别？',{
+
+            time:0
+            ,btn:['女', '男']
+            ,yes:function(index){
+
+                usexdo(0);
+                return false;
+            },btn2:function(){
+                usexdo(1);
+                return false;
+            }
+        });
+    }
+
+}
+
+function umsgbox(){
+    /*用户消息*/
+
+    openmue('我的消息','user/msgbox.html');
+
+}
+
+function ufangka_g(){
+
+   
+
+}
+
+function ufangka(){
+
+    /*我的房卡记录*/
+
+    openmue('我的房卡','user/jifen.html');
+
+}
+
+function ugamelist(){
+    /*游戏记录*/
+    openmue('我的游戏记录','user/games.html');
+
+}
+
+
+
+function uquite(){
+
+    /*退出登录*/
+
+    $.ajax({
+
+        url:USIN,
+        type: "POST",
+        data:{y:"quite",d:"get",apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            apptoken = getCookie("apptoken");
+
+            if(!apptoken || apptoken.lenght < 62){
+
+                if(data.data.apptoken) setCookie("apptoken",data.data.apptoken);
+            }
+
+
+            qtdenglu();
+
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+    });
+}
+
+
+function daojishi(){
+    
+
+    TIMEOUT--;
+    $(".fasongan").html('剩余'+TIMEOUT+'秒');
+
+    if(TIMEOUT < 1){
+
+        /*倒计时结束*/
+
+        $(".fasongan").removeClass('layui-btn-disabled');
+        DJSUO = 1;
+        TIMEOUT = 60;
+
+        $(".fasongan").html('点击发送');
+        window.clearInterval(DINGSHI); 
+    }
+
+}
+
+
+function loginreg(sx){
+
+    /*立即注册*/
+
+   
+
+
+
+}
+
+
+function loginpass(){
+
+    /*找回密码*/
+
+    loginreg(2);
+
+
+
+}
+
+
+function call_main(shti){
+
+    /*统一接口*/
+    eval(shti+'()');
+
+}
+
+
+
+
+function qtdenglu(){
+
+  
+
+    /*前台登录*/
+    $(".ucaidan").hide();
+
+   
+ 
+    html ='<form class="layui-form">';
+
+    html +='<div class="layui-form-item"><label class="layui-form-label">登录帐号</label><div class="layui-input-block"><input type="text" name="zhanghao" required  id="zzzz1" lay-verify="required" placeholder="帐号/手机/邮箱" id="adzhanghao" autocomplete="off" class="layui-input"></div></div>';
+    html +='<div class="layui-form-item"><label class="layui-form-label">登录密码</label><div class="layui-input-block"><input type="password" name="pass" required="" lay-verify="required"  id="zzzz2" placeholder="请输入密码" autocomplete="off" class="layui-input"></div></div></form>';
+
+    var index = layer.open({
+        title:'登录帐号',
+        content: html,
+        shade: 0,
+        id :'denglu',
+        area: ['300px', '210px'],
+        anim:  1,
+         type:1,
+        btn: ['登录'],
+        closeBtn :0,
+        yes: function(index, layero){
+
+            /*确认按钮*/
+
+            zhanghao = $("[name=zhanghao]").val();
+            pass = $("[name=pass]").val();
+
+            if(zhanghao.length > 36 || zhanghao.length < 1){
+
+               return layer.tips('登录帐号错误', "#zzzz1",{ tips: 4});
+
+            }
+
+
+            if(pass.length > 36 || pass.length < 3){
+
+
+                return layer.tips('登录密码错误', "#zzzz2",{ tips: 4});
+            }
+
+            $.ajax({
+
+                url:USIN,
+                type: "POST",
+                data:{y:"login",d:"get",zhanghao:zhanghao,pass:pass,apptoken:getCookie("apptoken")},
+                dataType: "json",
+                timeout:"3000",
+                success: function(data){
+
+                    apptoken = getCookie("apptoken");
+
+                    if(!apptoken || apptoken.lenght < 62){
+
+                        if(data.data.apptoken) setCookie("apptoken",data.data.apptoken);
+                    }
+
+                    qtinmain();
+                    layer.closeAll();
+
+                },error:function(XMLHttpRequest){
+
+                    
+                    ajaxfan(XMLHttpRequest);
+
+                    setTimeout(function(){
+
+                        qtdenglu();
+
+                    },1500);
+                }
+            });
+
+            return false;
+       
+        },btn2: function(index, layero){
+
+           
+
+        },btn3: function(index, layero){
+
+           
+        }
+    });
+}
+
+
+function isdaili(){
+
+    /*代理处理*/
+    window.location.href="daili.html";
+
+
+}
+
+function xinshou(){
+    /*录入新手礼包*/
+
+    layer.prompt({title: '请输入新手礼包KEY获得礼物'},function(value, index, elem){
+
+        $.ajax({
+
+            url:USIN,
+            type: "POST",
+            data:{y:"index",d:"delete",code:value,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                apptoken = getCookie("apptoken");
+
+                if(!apptoken || apptoken.lenght < 62){
+
+                    if(data.data.apptoken) setCookie("apptoken",data.data.apptoken);
+                }
+
+                if(data.data){
+
+
+                    $(".ufangka_v").html(data.data);
+                
+                    $(".xinshou").hide();
+                }
+
+                
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+        });
+
+        layer.close(index);
+
+    });
+
+
+
+}
+
+
+function qtinmain(){
+
+    $.ajax({
+
+        url:USIN,
+        type: "POST",
+        data:{y:"index",d:"get",duzil:1,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            apptoken = getCookie("apptoken");
+
+            if(!apptoken || apptoken.lenght < 62){
+
+                if(data.data.apptoken) setCookie("apptoken",data.data.apptoken);
+            }
+
+            D = data.data;
+            /*取得帐号信息*/
+            ujiexi(D);
+            $(".ucaidan").show();
+          
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+    });
+
+}
+
+
+
+layui.use(['jquery','laytpl','layer','form', 'element'], function(){
+
+    var layer = layui.layer,form = layui.form();
+    $ = layui.jquery;
+    var laytpl = layui.laytpl;
+    qtinmain();
+
+});
+</script>

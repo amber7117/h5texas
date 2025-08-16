@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+.layui-form{padding-top:10px;}
+.off0{color:#eee;}
+.off1{color:#aaa;}
+.off2{color:green;}
+.off3{color:red;}
+</style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;"> 
+    
+        <p style="padding:10px 20px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop" style="color:red;">&#xe63d;</i> 加载中...</p>
+    </div>
+
+    <script id="select" type="text/html">
+    <table class="layui-table" >
+
+        <tr>
+            <td colspan="10"> 
+            <div class="layui-form-item">
+            <form class="layui-form" onsubmit="return sousuo();">
+                <div class="layui-input-inline">
+                    <select name="BIZHONG" id="BIZHONG">
+                        <option value="-1" selected="selected">选择提现币种</option>
+
+                        {{# layui.each(TIXIANBIZHONG, function(index, item){ }}
+                             <option value="{{ index }}" {{ BIZHONG == index ?' selected="selected" ':''}} >{{ item }}</option>
+                        {{# }); }}
+
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="STATE" id="STATE">
+                        <option value="-1" selected="selected">选择审核状态</option>
+
+                        {{# layui.each(TIXIANSTATE, function(index, item){ }}
+                             <option value="{{ index }}" {{ STATE == index ?' selected="selected" ':''}} >{{ item }}</option>
+                        {{# }); }}
+
+                    </select>
+                </div>
+
+                <div class="layui-input-inline" style="width:88px;">
+                    <input type="text" name="SOID" value="{{ SOID }}" id="SOID" placeholder="用户uid" autocomplete="off"  class="layui-input">
+                </div> 
+
+                <button class="layui-btn layui-btn-normal" ><i class="layui-icon">&#xe615;</i> 立即搜索</button>
+
+                {{# if(TONGJIN != '0'){ }}
+
+                    <button class="layui-btn layui-btn-danger" ><i class="layui-icon">&#xe62e;</i> {{ TONGJIN }}</button>
+
+                {{# } }}
+                </form>
+             </div>
+            </td>
+         
+        </tr>
+
+        <colgroup>
+
+            {{# if( $(window).width() > 700){ }}
+
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+       
+            {{# } }}
+
+            <col>
+            <col>
+            <col>
+         
+        </colgroup>
+
+        <thead>
+
+            <tr>
+                <th>UID</th>
+                <th>昵称</th>
+                <th>openid</th>
+            {{# if( $(window).width() > 700){ }}
+
+                <th>提现币种</th>
+                <th>提现时间</th>
+                <th>提现状态</th>
+
+            {{# } }}
+                <th>提现金额</th>
+
+                <th>操作</th>
+            </tr>
+            
+        </thead>
+        <tbody>
+
+        {{#  layui.each(d, function(index, item){ }}
+  
+            <tr id="tb{{ item.uid }}">
+
+                <td>{{ item.uid }}</td>
+                
+                <td>{{ item.username }}</td>
+
+                <td>{{ item.openid }}</td>
+
+                {{# if( $(window).width() > 700){ }}
+
+                    <td>{{ TIXIANBIZHONG[item.type - 1] }}</td>
+                    <td>{{ item.time }}</span></td>
+                    <td>{{ TIXIANSTATE[item.state] }}</td>
+                    <td>{{ item.txjine }}</td>
+       
+                {{# } }}
+
+                <td>
+                    <button class="layui-btn" onclick="edit({{ item.id }},{{1}});"><i class="layui-icon">&#xe642;</i>同意</button>
+                    <button class="layui-btn" onclick="edit({{ item.id }},{{2}});"><i class="layui-icon">&#xe642;</i>拒绝</button>
+                </td>
+
+            </tr>
+
+        {{# }); }}
+    </tbody>
+</table>
+
+    </script>
+    <div class="baoqi" style="padding:0px 20px;">
+
+        <div id="page" style="float:left;"></div>
+
+    </div>
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+var MODE = 'tixianshenhe';
+var NUM = 10;
+var pg = 1;
+var quanxin = Array();
+var ID = 0;
+var TYPE;
+var TIXIANSTATE;
+var TIXIANBIZHONG;
+
+var BIZHONG = '';
+var STATE = '';
+var SOID = '';
+var TONGJIN = 0;
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function sousuo(){
+
+    BIZHONG  = $("#BIZHONG").val();
+    STATE  = $("#STATE").val();
+    SOID  = $("#SOID").val();
+    pg =1;
+
+    dbselect();
+    return false;
+
+}
+
+function dbdel(ID){
+
+}
+
+
+function edit(ID,select){
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"post",id:ID,state:select,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"6000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            if(data.code == 1){
+
+                dbselect();
+
+            }
+
+            layer.msg(data.msg);
+            
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+
+}
+
+function add(ID){
+
+   
+}
+
+
+
+function vwselect(data){
+
+    laytpl = layui.laytpl;
+    element = layui.element();
+    form = layui.form();
+    var tpl = document.getElementById('select').innerHTML;
+    var render = laytpl(tpl).render(data.data);
+    document.getElementById('view').innerHTML = render;
+    element.init();
+
+    form = layui.form();
+  
+    form.render('select'); 
+    
+ 
+}
+
+
+function dbselect(){
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",type:BIZHONG,uid:SOID,state:STATE,num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"6000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            D = data.data;
+
+            if(D.bizhong){
+
+                TIXIANBIZHONG = D.bizhong;
+            }
+
+            if(D.shenhestate){
+
+                TIXIANSTATE = D.shenhestate;
+            }
+
+            
+            if(data.code == 1){
+
+               
+
+                if(D.type){
+
+                    TYPE = D.type;
+                }
+
+                if(D.jine){
+
+                    TONGJIN = D.jine;
+
+                }else{
+
+                    TONGJIN = 0;
+                }
+
+                vwselect(D);
+
+            }else{
+
+                layer.msg('没有更多数据');
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+}
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+    var layer = layui.layer,
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    var laytpl = layui.laytpl;
+    var laypage = layui.laypage;
+
+    dbselect();
+    laypage({
+        cont:'page',
+        pages:10000000,
+        skip:false,
+        jump:function(obj,first)
+        {
+            if(!first){
+                pg = obj.curr;
+                dbselect();
+            }
+        }
+    });
+
+});
+
+</script>
+
+
+

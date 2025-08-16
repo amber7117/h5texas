@@ -1,0 +1,1 @@
+<?php $time= '30'; return '-1';

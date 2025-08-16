@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+.layui-form{padding-top:10px;}
+</style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;"> 
+    
+        <p style="padding:10px 20px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop" style="color:red;">&#xe63d;</i> 加载中...</p>
+    </div>
+
+    <script id="select" type="text/html">
+    <table class="layui-table" >
+        <colgroup>
+
+            {{# if( $(window).width() > 700){ }}
+
+            <col>
+            <col>
+            <col>
+            <col>
+            {{# } }}
+
+            <col>
+            <col>
+         
+        </colgroup>
+        <thead>
+
+            <tr>
+            {{# if( $(window).width() > 700){ }}
+
+                <th>ID</th>
+
+            {{# } }}
+
+                <th>支付方式</th>
+
+            {{# if( $(window).width() > 700){ }}
+
+                <th>支付文件</th>
+                <th>支付状态</th>
+                <th>显示状态</th>
+                <th>APP支付</th>
+
+            {{# } }}
+
+                <th>操作</th>
+            </tr>
+
+        </thead>
+        <tbody>
+
+        {{#  layui.each(d, function(index, item){ }}
+  
+            <tr id="tb{{ item.id }}">
+
+                {{# if( $(window).width() > 700){ }}
+
+                    <td>{{ item.id }}</td>
+
+                {{# } }}
+
+                <td>{{ item.name }}</td>
+
+                {{# if( $(window).width() > 700){ }}
+
+                    <td>{{ PAYFILE[item.payfile] }}</td>
+                    <td><span class="off{{ item.off }}">{{ YESNO[item.off] }}</span></td>
+                    <td><span class="off{{ item.xianshi }}">{{ YESNO[item.xianshi] }}</span></td>
+                    <td><span class="off{{ item.isapp }}">{{ payyesno[item.isapp] }}</span></td>
+
+                {{# } }}
+
+                <td>
+
+                    <button class="layui-btn" onclick="edit({{ item.id }});"><i class="layui-icon">&#xe642;</i> 编辑</button>
+                    <button class="layui-btn layui-btn-danger  layui-btn-small" onclick="dbdel({{ item.id }});"><i class="layui-icon">&#xe640;</i> 删除</button>
+
+                </td>
+
+            </tr>
+        {{# }); }}
+    </tbody>
+</table>
+
+
+    
+
+
+    </script>
+    <div class="baoqi" style="padding:0px 20px;">
+
+        <button class="layui-btn layui-btn-normal  layui-btn-small" onclick="add();" style="float:left;margin-right:18px;margin-top:10px;"><i class="layui-icon">&#xe654;</i> 新建 </button>
+        <div id="page" style="float:left;"></div>
+
+    </div>
+
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+var MODE = 'pay';
+var NUM = 10;
+var pg = 1;
+var quanxin = Array();
+var ID = 0;
+var TYPE;
+var SOl =-1;
+var SOID = '';
+var SOSO = '';
+var TONGJIN = 0;
+
+
+var YESNO;
+var payyesno;
+var PAYFILE;
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function sousuo(){
+
+    SOl  = $("#SOl").val();
+    SOID  = $("#SOID").val();
+    SOSO  = $("#SOSO").val();
+    pg =1;
+
+    dbselect();
+    return false;
+
+}
+
+function dbdel(ID){
+
+    /*删除数据*/
+
+    layer.confirm('确定删除?', {icon: 3, title:'提示'}, function(index){
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:{y:MODE,d:"delete",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    $("#tb"+ID).remove();
+                    layer.close(index);
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+        });
+    });
+}
+
+
+
+function edit(ID){
+
+    html ='<form name="form" id="form" class="layui-form">';
+    BIAO = Array(
+        'name#支付名称#text##支付名称##required',
+        'suoluetu#缩略图#update##缩略图##',
+        'payfile#支付方式#select##PAYFILE##',
+        'off#支付状态#select##YESNO##',
+        'xianshi#显示状态#select##YESNO##',
+        'isapp#APP支付#select##payyesno##',
+        'payid#支付密ID#text##支付ID##',
+        'paykey#支付密钥#text##支付密钥##',
+        'zhanghao#支付帐号#text##支付帐号##',
+        'beizhu#支付备注#text##支付备注##',
+        'paixu#排序#text##排序##',
+     
+
+        'tijiao##tjcz###立即修改#tijiao'
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    }
+
+    html+="</form>";
+
+    OPID = layer.open({
+        type: 1,
+        title:false,
+        area: ['100%', '100%'],
+        fixed: true, 
+        maxmin: false,
+        content: html
+    });
+
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            if(data.code == 1){
+
+                D = data.data;
+
+                for(var H in D){
+
+                    if(H =='atime' || H == 'ctime'){
+
+                        $("[name="+H+"]").val( time(D[H]) );
+                    
+                    
+                    }else{
+
+                        $("[name="+H+"]").val(D[H]);
+                    }
+
+                    
+                
+                }
+
+                form = layui.form();
+                form.render();
+                
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+
+    form = layui.form();
+
+    form.on('submit(tijiao)', function(data){
+ 
+        dd = {y:MODE,d:"put",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")};
+        obj = $.extend(dd,data.field);
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:obj,
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    layer.close(OPID);
+                    dbselect();
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+        return false;
+    });
+
+   
+    form.render();
+}
+
+
+
+function add(ID){
+
+    /*新建数据*/
+
+    html ='<form name="form" id="form" class="layui-form">';
+    BIAO = Array(
+        'name#支付名称#text##支付名称##required',
+        'suoluetu#缩略图#update##缩略图##',
+        'payfile#支付方式#select##PAYFILE##',
+        'off#支付状态#select##YESNO##',
+        'xianshi#显示状态#select##YESNO##',
+        'isapp#APP支付#select##payyesno##',
+        'payid#支付密ID#text##支付ID##',
+        'paykey#支付密钥#text##支付密钥##',
+        'zhanghao#支付帐号#text##支付帐号##',
+        'beizhu#支付备注#text##支付备注##',
+        'paixu#排序#text##排序##',
+       
+        'tijiao##tjcz###立即添加#tijiao'
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    
+    }
+
+    html+="</form>";
+
+    OPID = layer.open({
+        type: 1,
+        title:false,
+        area: ['100%', '100%'],
+        fixed: true, 
+        maxmin: false,
+        content: html
+    });
+
+    form = layui.form();
+
+    form.on('submit(tijiao)', function(data){
+
+        dd = {y:MODE,d:"post",ttoken:TOKEN,apptoken:getCookie("apptoken")};
+        obj = $.extend(dd,data.field);
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:obj,
+            dataType: "json",
+            timeout:"3000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+
+                    
+                    layer.close(OPID);
+                    dbselect();
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+        return false;
+    });
+
+    form.render();
+}
+
+
+
+function vwselect(data){
+
+
+
+    laytpl = layui.laytpl;
+    element = layui.element();
+    form = layui.form();
+    var tpl = document.getElementById('select').innerHTML;
+    var render = laytpl(tpl).render(data.data);
+    document.getElementById('view').innerHTML = render;
+    element.init();
+
+    form = layui.form();
+  
+    form.render('select'); 
+    
+ 
+}
+
+
+function dbselect(){
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",level:SOl,tuid:SOID,soso:SOSO,num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            D = data.data;
+
+
+            if (D.yesno)
+            {
+                YESNO = D.yesno;
+            }
+
+            if(D.payyesno){
+
+                payyesno = D.payyesno;
+            }
+
+            if (D.payfile)
+            {
+                PAYFILE = D.payfile;
+            }
+
+            if(data.code == 1){
+
+                
+
+                layer.closeAll();
+
+                
+              
+                vwselect(D);
+
+            }else{
+
+                layer.msg('没有更多数据');
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+}
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+    var layer = layui.layer,
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    var laytpl = layui.laytpl;
+    var laypage = layui.laypage;
+
+    dbselect();
+    laypage({
+        cont:'page',
+        pages:10000000,
+        skip:false,
+        jump:function(obj,first)
+        {
+            if(!first){
+                pg = obj.curr;
+                dbselect();
+            }
+        }
+    });
+
+});
+
+</script>
+
+
+

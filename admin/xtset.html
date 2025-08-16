@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+
+
+.layui-input, .layui-textarea{width:80%;}
+@media screen and (max-width: 450px){
+.layui-form-item .layui-input-inline{margin-left:5px;}
+
+}
+.layui-form-label{width:120px;}
+
+</style>
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;">
+    
+    <form name="form" id="form" class="layui-form">
+
+        <div class="layui-tab">
+          <ul class="layui-tab-title">
+           
+            <li  class="layui-this">常用设置</li>
+            <li>游戏参数</li>
+            <li>视频龙虎斗参数</li>
+            <li>apk红包参数</li>
+            <li>登录第三方配置</li>
+          </ul>
+          <div class="layui-tab-content" id="neirong">
+            
+            
+          </div>
+        </div>
+
+    </form>
+    
+  
+    </div>
+
+    
+
+
+
+</div>
+
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+var NUM = 10;
+var pg = 1;
+var quanxin = Array();
+var ID = 0;
+var MODE = 'xtset';
+var FUZHI = 1;
+var HUOBI = Array();
+var KJREG = ['关闭','开启'];
+var TONGPEI = ['通杀','杀一半','通赔'];
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function add(data){
+
+    html ='<div class="layui-tab-item layui-show">';
+
+    tiaoshi = Array('关闭','打开');
+    D = data.data;
+
+    /*常规设置*/
+
+    BIAO = Array(
+
+        'title#网站标题#text##网站标题##',
+        'miaoshu#网站描述#text##网站描述##',
+        'guanjian#网站关键词#text##网站关键词##',
+        'logo#网站LOGO#update##网站LOGO##',
+        'HTTP#落地域名#text##落地域名##',
+        'KeFu#客服联系方式#text##客服联系方式##',
+        'xiaoxi#消息公告图#update##消息公告图##',
+        // 'JOINHTTP#入口域名#text##入口域名##',
+        // 'FYUTIME#防御时间#text##防御时间##',
+        // 'FYUNUM#防御数量#text##防御数量##',
+        'payjine#最低支付#text##最低支付金额##',
+        // 'maxsize#附件大小#text##附件大小(B)##',
+        // 'dbug#调试模式#select##tiaoshi##',
+        'shiqu#时区设置#text##时区设置##',
+        // 'sessiontime#过期时间#text##过期时间##',
+        // 'jine#jine名字#text##jine名字##',
+        'jifen#jifen名字#text##jifen名字##',
+        // 'huobi#huobi名字#text##huobi名字##',
+        // 'shouhu#游戏守护#select##tiaoshi##',
+        'tijiao##tjcz###立即设置#tijiao'
+
+       
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    }
+
+
+
+
+    html+='</div>';
+    
+
+    html +='<div class="layui-tab-item">';
+
+    /*游戏设置*/
+    HUOBI.push(D.jine);
+    HUOBI.push(D.jifen);
+    HUOBI.push(D.huobi);
+    
+
+    BIAO = Array(
+
+        'ewmyuming#二维码域名（一般不要改）#text##二维码域名##',
+
+        'erweima#推广二维码背景#update##推广二维码背景图片##',
+        'erweima_dx#二维码大小#text##推广二维码大小##',
+        'erweima_zy#码位置(左右)#text##推广二维码位置（左右）##',
+        'erweima_sx#码位置(上下)#text##推广二维码位置（上下）##',
+
+        'kefu#客服二维码#update##客服二维码##',
+        'QQ#客服QQ号#text##客服QQ号##',
+        'CZKeFu#充值客服二维码#update##充值客服二维码##',
+        'GZH#公众号二维码#update##公众号二维码##',
+        
+        'kjlogin#快捷注册#select##KJREG##',
+        // 'paybilijne#'+D.jine+'默认充值比例#text##默认充值比例##',
+        'paybilifk#'+D.jifen+'默认充值比例#text##默认充值比例##',
+        'paybilijb#'+D.huobi+'默认充值比例#text##默认充值比例##',
+        // 'regsongje#注册赠'+D.jine+'#text##注册赠送##',
+        'regsongfk#注册赠'+D.jifen+'#text##注册赠送##',
+        'regsongjb#注册赠'+D.huobi+'#text##注册赠送##',
+        // 'lurutuije#录入代理赠'+D.jine+'#text##录入代理赠送##',
+        // 'lurutuifk#录入代理赠'+D.jifen+'#text##录入代理赠送##',
+        // 'lurutuijb#录入代理赠'+D.huobi+'#text##录入代理赠送##',
+        // 'shangjlje#推广人获得'+D.jine+'#text##推广人获得##',
+        // 'shangjlfk#推广人获得'+D.jifen+'#text##推广人获得##',
+        // 'shangjljb#推广人获得'+D.huobi+'#text##推广人获得##',
+        // 'jifenhuobi#推广计费方式#select##HUOBI##',
+        // 'tuisongip#推广有效ip个数#text##推广赠送有效ip数##',
+        'qunzhuNeed#成为群主所需房卡#text##成为群主所需房卡##',
+        // 'zhuanpanbi#转盘消耗方式#select##HUOBI##',
+        
+        // 'zhuanpanxiao#转盘消耗jifen#text##转盘每次消耗##',
+        // 'zhuanpancishu#每日转盘次数#text##每日转盘次数##',
+      
+
+        // 'fangkajin#'+D.jifen+'兑换'+D.huobi+'比例#text##'+D.jifen+'兑换'+D.huobi+'比例1/多少0就是不兑换##',
+        
+        // 'dailims#默认滚动#textarea##默认代理滚动介绍##',
+        'gonggao#系统公告#textarea##系统公告##',
+        // 'agame#大厅分享$#textarea##大厅分享##',
+        // 'afenxiang#房间分享$#textarea##房间分享##',
+        // 'azgengxin#安卓下载#textarea##安卓下载地址##',
+        // 'pggengxin#苹果下载#textarea##苹果下载地址##',
+        'tijiao##tjcz###立即设置#tijiao'
+
+
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    }
+
+
+
+
+    html+='</div>';
+
+    /*视频龙虎斗设置*/
+    html +='<div class="layui-tab-item">';
+
+    TESHU = ['是','否'];
+    
+    BIAO = Array(
+
+        'lhtitle#游戏名称#text##游戏名称##',
+
+        'lhtongpei#通赔设置#select##TONGPEI##',
+        
+        'lhKeFu#客服二维码#update##客服二维码##',
+
+        'lhgonggaotu#游戏公告图#update##游戏公告图##',
+
+        'lherweima#推广二维码背景#update##推广二维码背景图片##',
+        'lherweima_dx#二维码大小#text##推广二维码大小##',
+        'lherweima_zy#码位置(左右)#text##推广二维码位置（左右）##',
+        'lherweima_sx#码位置(上下)#text##推广二维码位置（上下）##',
+
+        'lhyongjinbili#佣金比例#text##佣金比例,下划线连接，如（0.05_0.03_0.02_0.01_0.01）##',
+
+        'lhzaixian#在线人数#text##在线人数##',
+        'lhzaixianfudong#在线人数浮动范围#text##在线人数浮动范围##',
+        'lhzaixianjiange#在线人数修改间隔时间#text##在线人数修改间隔时间##',
+
+        'lhbetjine#下注金额#text##下注金额##',
+
+        'lhariobtbet#机器人下注间隔#text##机器人下注间隔##',
+
+        'lhjiangchi#游戏实时奖池#text##游戏实时奖池##',
+        'lhtodayget#每日盈利#text##在达到此盈利前系统吃大赔小##',
+        'lhgethave#今日盈利是否达到#text##今日盈利是否达到##',
+        'lhchidabili#吃大赔小比例#text##在达到盈利前系统吃大赔小的比例##',
+
+        'lhlong#龙倍率#text##龙倍率##',
+        'lhhu#虎倍率#text##虎倍率##',
+        'lhhe#和倍率#text##和倍率##',
+
+        'lhhebili#和开奖比例#text##和开奖比例##',
+        'lhisteshu#是否是奖池够赔的情况下再开和#select##TESHU##',
+
+        'lhrobotbet#机器人下注区域比例#text##机器人分别的下注比例，下划线连接（如：龙_虎_和）##',
+        'lhrobotbetjinebili#机器人下注筹码比例#text##机器人每个筹码的下注比例，下划线连接（注：筹码1_筹码2_筹码3_筹码4_筹码5）##',
+
+        'lhdailims#默认滚动#textarea##默认代理滚动介绍##',
+       
+        'tijiao##tjcz###立即设置#tijiao'
+
+
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    }
+
+    html+='</div>';
+
+
+
+    /*apk红包设置*/
+    html +='<div class="layui-tab-item">';
+
+    GOUPEI = ['是','否'];
+    KEFU = ['在线客服','客服二维码'];
+    BIAO = Array(
+
+        'apkhbtitle#游戏名称#text##游戏名称##',
+
+        'apkhbgonggao#游戏公告图#update##游戏公告图(宽：550px)##',
+        
+        'apkhblogo#平台头像#update##平台头像##',
+        'apkhbname#平台头像#text##平台头像##',
+
+        'apkgivesxf#金币赠送手续费#text##金币赠送手续费##',
+
+        'apkhberweima#网页推广二维码背景(720*1280)#update##推广二维码背景图片##',
+        'apkhberweima_dx#网页二维码大小#text##推广二维码大小##',
+        'apkhberweima_zy#网页码位置(左右)#text##推广二维码位置（左右）##',
+        'apkhberweima_sx#网页码位置(上下)#text##推广二维码位置（上下）##',
+        'apkhberweima1#apk推广二维码背景(360*640)#update##推广二维码背景图片##',
+        'apkhberweima_dx1#apk二维码大小#text##推广二维码大小##',
+        'apkhberweima_zy1#apk码位置(左右)#text##推广二维码位置（左右）##',
+        'apkhberweima_sx1#apk码位置(上下)#text##推广二维码位置（上下）##',
+
+        'apkhbtgrule#推广规则说明#update##推广规则说明##',
+        'apkhbrule#游戏规则图#update##游戏规则图(宽：824px)##',
+        'apkhbniurule#牛牛游戏规则#update##牛牛游戏规则##',
+        'apkhbxtrule#扫雷玩法规则#update##扫雷玩法规则(宽：824px)##',
+        'apkhbroomrule#创建群规则#update##创建群规则(宽：824px)##',
+
+        'apkhkefutype#联系客服方式#select##KEFU##',
+        
+        'apkhbKeFuurl#客服链接#text##客服链接##',
+        'apkhbCZKeFuurl#充值客服客服链接#text##充值客服客服链接##',
+        'apkhbHDKeFuurl#活动客服客服链接#text##活动客服客服链接##',
+
+        'apkhbKeFu#客服二维码#update##客服二维码##',
+        'apkhbCZKeFu#充值客服二维码#update##充值客服二维码##',
+        'apkhbHDKeFu#活动客服二维码#update##活动客服二维码##',
+
+        'apkhbfbyongjinbili#发包佣金比例#text##发包佣金比例,下划线连接，如（0.05_0.03_0.02_0.01_0.01）##',
+        'apkhbqbyongjinbili#抢包佣金比例#text##抢包佣金比例,下划线连接，如（0.05_0.03_0.02_0.01_0.01）##',
+
+        'apkhbfbchoushui#发包抽水比例#text##发包抽水比例##',
+        'apkhbqbchoushui#抢包抽水比例#text##抢包抽水比例##',
+        
+        'apkhbzrleinum#真人发包雷数量(若雷数量为-1,则切换随机比例)#text##真人发包雷数量##',
+        'apkhbzrleibili1#真人随机雷比例1(从0~10排序)#text##真人随机雷比例1##',
+        'apkhbzrleibili2#真人随机雷比例2(从0~10排序)#text##真人随机雷比例2##',
+        'apkhbzrleibili3#真人随机雷比例3(从0~10排序)#text##真人随机雷比例3##',
+        'apkhbzrsuijitime#真人随机雷比例切换时间范围(单位为秒)#text##真人随机雷比例切换时间范围##',
+
+        'apkhbaleinum#机器人发包雷数量(若雷数量为-1,则切换随机比例)#text##机器人发包雷数量##',
+        'apkhbaleibili1#机器人随机雷比例1(从0~10排序)#text##机器人随机雷比例1##',
+        'apkhbaleibili2#机器人随机雷比例2(从0~10排序)#text##机器人随机雷比例2##',
+        'apkhbaleibili3#机器人随机雷比例3(从0~10排序)#text##机器人随机雷比例3##',
+        'apkhbasuijitime#机器人随机雷比例切换时间范围(单位为秒)#text##机器人随机雷比例切换时间范围##',
+        
+        'apkhbzhenrenzhongbili#真人优先中雷比例#text##真人优先中雷比例##',
+
+        'apkhbguoqi#红包过期时间（单位为秒）#text##红包过期时间##',
+
+        'apkhbmaxmailei#最大发红包金额#text##最大发红包金额##',
+        'apkhbminmailei#最小发红包金额#text##最小发红包金额##',
+       
+        'apkhbminjine#最小红包金额比例#text##最小红包金额比例##',
+
+        'apkfltime#福利群整点红包时间(下划线连接)#text##福利群整点红包时间(下划线连接)##',
+        'apkflguoqi#福利群红包过期时间（单位为秒）#text##福利群红包过期时间##',
+        'apkflhbnum#福利群红包数量#text##福利群红包数量##',
+        'apkflhbjiange#福利群发红包间隔时间#text##福利群发红包间隔时间##',
+        'apkflmaxmailei#福利群最大发红包金额#text##福利群最大发红包金额##',
+        'apkflminmailei#福利群最小发红包金额#text##福利群最小发红包金额##',
+        'apkfllimit#福利群每日抢红包流水限制#text##福利群每日抢红包流水限制##',
+
+        'apkhbAirobtfb#系统群是否让机器人发红包#select##GOUPEI##',
+        'apkhbairobtfbbili#系统群机器人发包比例#text##机器人发包比例##',
+        'apkhbairobtszjine#系统群机器人发红包金额范围（下划线连接）#text##机器人发红包金额范围（下划线连接）##',
+        'apkhbairobtleihao#系统群机器人发红包雷号数量（下划线连接）#text##机器人发红包雷号数量（下划线连接）##',
+        'apkhbisAirobt#系统群是否让机器人抢红包#select##GOUPEI##',
+        'apkhbAirobttime#系统群机器人抢红包间隔时间范围(单位为秒,下划线连接)#text##机器人抢红包间隔时间范围##',
+        'apkhbiszhenren#系统群是否让机器人模拟真人抢红包#select##GOUPEI##',
+        'apkhbairobtbili#系统群机器人中雷比例#text##机器人中雷比例##',
+
+        'apkhbmiansi#系统群机器人中雷免死比例#text##系统群机器人中雷免死比例##',
+
+        'apkhbuserguoqi#玩家群红包过期时间（单位为秒）#text##玩家群红包过期时间##',
+        // 'apkhbuserAirobtfb#玩家群是否让机器人发红包#select##GOUPEI##',
+        // 'apkhbuserairobtfbbili#玩家群机器人发包比例#text##机器人发包比例##',
+        // 'apkhbuserairobtleihao#玩家群机器人发红包雷号数量（下划线连接）#text##玩家群机器人发红包雷号数量（下划线连接）##',
+        // 'apkhbuserisAirobt#玩家群是否让机器人抢红包#select##GOUPEI##',
+        // 'apkhbuserAirobttime#玩家群机器人抢红包间隔时间范围(单位为秒,下划线连接)#text##机器人抢红包间隔时间范围##',
+        // 'apkhbuseriszhenren#玩家群是否让机器人模拟真人抢红包#select##GOUPEI##',
+        // 'apkhbuserairobtbili#玩家群机器人中雷比例#text##机器人中雷比例##',
+        'apkhbuserzhenrenzhongbili#玩家群中雷比例#text##玩家群中雷比例##',
+        'apkhbuserrenewlimit#玩家群续费最低分钟数#text##玩家群续费最低分钟数##',
+        'apkhbuserrenewneed#玩家群续费每分钟所需金币#text##玩家群续费每分钟所需金币##',
+
+        'apkhbniubeilv#牛倍率(牛一到牛牛用下划线连接)#text##牛倍率##',
+        'apkhbniuwinget#牛牛赢家抽水比例#text##牛牛赢家抽水比例##',
+        'apkhbzrfbwinzr#牛牛真人发包赢真人比例#text##牛牛真人发包赢真人比例##',
+        'apkhbzrfbwinai#牛牛真人发包赢机器人比例#text##牛牛真人发包赢机器人比例##',
+        'apkhbaifbwinzr#牛牛机器人发包赢真人比例(负数为放水，0为随机)#text##牛牛机器人发包赢真人比例##',
+
+        'apkhbfbgetnum#发包达多少可抽奖一次#text##发包达多少可抽奖一次##',
+        'apkhbqbgetnum#抢包达多少可抽奖一次#text##抢包达多少可抽奖一次##',
+        'apkhbyjgetnum#佣金达多少可抽奖一次#text##佣金达多少可抽奖一次##',
+        
+        'apkhbdailims#默认滚动#textarea##默认代理滚动介绍##',
+
+        'tijiao##tjcz###立即设置#tijiao'
+
+
+    );
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    }
+
+    html+='</div>';
+
+
+
+
+    /*登录设置*/
+    html +='<div class="layui-tab-item">';
+
+    BIAO = Array(
+
+        // 'mailfa#邮箱帐号#text##邮箱发送帐号##',
+        'loading#支付按钮#text##支付按钮名字##',
+        // 'duanxinid#短信ID#text##短信ID##',
+        // 'duanxinkey#短信KEY#text##短信KEY##',
+        // 'duanxinbei#短信备注#text##短信备注##',
+        // 'kjqqid#QQ登录#text##QQ登录ID##',
+        // 'kjqqkey#QQ密钥#text##QQ密钥##',
+        // 'kjqqname#QQ备注#text##QQ登录备注##',
+        'kjwxid#微信公ID#text##微信公众号ID##',
+        'kjwxkey#微信公密钥#text##微信公众号密钥##',
+        'kjwxname#微信公备注#text##微信公众号登备注##',
+        'tx_uid#零钱提现UID#text##零钱提现UID##',
+
+        'tx_key#零钱提现KEY#text##零钱提现KEY##',
+        // 'kjkwxid#微信开ID#text##微信开放平台ID##',
+        // 'kjkwxkey#微信开密钥#text##微信开放平台密钥##',
+        // 'kjkwxname#微信开备注#text##微信开放平台备注##',
+        // 'kjweiboid#微博ID#text##新浪微博ID##',
+        // 'kjweibokey#微博密钥#text##新浪微博密钥##',
+        'kjweiboname#微信备注#text##微信开放平台备注##',
+        // 'kjzfbid#支付宝ID#text##支付宝ID##',
+        // 'kjzfbkey#支付宝密钥#text##支付宝密钥##',
+        // 'kjzfbname#支付宝备注#text##支付宝备注(帐号)##',
+
+        'tijiao##tjcz###立即设置#tijiao'
+    );
+
+    for(var z in BIAO){
+
+        html+=jsfrom(BIAO[z]);
+    }
+
+
+
+
+    html+='</div>';
+
+    if(FUZHI == 1){
+
+        /*直接新建立*/
+        $("#neirong").html(html);
+    }
+
+  
+
+    for(var H in D){
+
+        if(H =='atime' || H == 'qdtime'){
+
+            $("[name="+H+"]").val( time(D[H]) );
+        
+        
+        }else{
+
+            $("[name="+H+"]").val(D[H]);
+        }
+
+        
+    
+    }
+
+    element = layui.element();
+    form = layui.form();
+    element.init();
+    form.render('select');
+    form.on('submit(tijiao)', function(data){
+ 
+        dd = {y:MODE,d:"put",id:ID,ttoken:TOKEN,apptoken:getCookie("apptoken")};
+        obj = $.extend(dd,data.field);
+
+        $.ajax({
+
+            url:TXIN,
+            type: "POST",
+            data:obj,
+            dataType: "json",
+            timeout:"10000",
+            success: function(data){
+
+                if(data.token && data.token != ""){
+                
+                    TOKEN = data.token;
+                }
+
+                if(data.code == 1){
+
+                    layer.msg("修改成功");
+
+                    FUZHI = 2;
+                    dbselect();
+                }
+
+            },error:function(XMLHttpRequest){
+
+                ajaxfan(XMLHttpRequest);
+            }
+
+        });
+
+        return false;
+    });
+
+}
+
+
+function dbselect(){
+
+    $(".baoqi").show();
+
+    $.ajax({
+
+        url:TXIN,
+        type: "POST",
+        data:{y:MODE,d:"get",num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"10000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            if(data.code == 1){
+
+
+                add(data);
+
+            }else{
+
+                layer.msg('没有更多数据');
+            }
+
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+
+}
+
+
+
+
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+
+    var layer = layui.layer,
+ 
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    var laytpl = layui.laytpl;
+
+    dbselect();
+
+
+});
+
+</script>
+
+
+

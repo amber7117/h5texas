@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>头像上传</title>
+  <link rel="stylesheet" href="/layui/css/layui.css">
+  <style>
+  .layui-word-aux{padding-left:20px;}
+  .layui-form-item{margin-bottom:8px;}
+  .layui-word-aux{font-size:14px;color:#009688;white-space:nowrap;}
+  .layui-layout-admin{display:none;}
+  #veiw{padding:10px 30px 10px 0px;max-width:588px;margin:0 auto;}
+  .login{padding-left:30px;text-align:center;display:inline-block;}
+  .login img{width:50px;height:50px;}
+  .ucaidan li{margin-bottom:10px;clear:both;}
+  .ucaidan li .layui-btn{margin:0px 1px 0px 0px;}
+  .layui-btn i{width:28px;display:inline-block;}
+  .utouxiang_v img{border:1px solid #009688;border-radius:50%;background:#fff;}
+   .layui-form-label{width:60px;}
+   .umsgbox_v span{color:Red;display:inline-block;height:20px;line-height:20px;padding:0px 6px;border:1px solid #eef;border-radius:50%;background:#ffe;margin-left:10px;}
+
+   body{background:#000;background-position:center center;height:100%; background-attachment: fixed;background-size:10%;}
+
+   .xinshou,.isdaili{display:none;}
+
+    @media screen and (min-width: 750px) {
+    
+        body{background-position:center 80%;}
+    }
+
+  </style>
+</head>
+<style>
+ .layui-layer-page .layui-layer-content{padding:8px 6px 0px 6px;}
+ .ucaidan{display:none;}
+
+ </style>
+<body>
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+<buttom id="up"><i class="layui-icon">&#xe60d;</i> 点击上传头像</buttom>
+<script src="/layui/layui.js"></script>
+<script>
+
+layui.config({
+    base: '/layui/lay/modules/'
+});
+
+if($_GET['apptoken']){
+    setCookie('apptoken', $_GET['apptoken']);
+}
+
+
+   
+
+    
+
+ var uploader = WebUploader.create({
+    auto: true,
+    server:HTTP+'update.php?&uplx=image&touxiang=1&apptoken='+getCookie("apptoken"),
+    pick: "#up",
+    resize: true,
+    fileVal :"image",
+    compress:{
+        width: 100,
+        height: 100,
+
+        quality: 80,
+
+
+        allowMagnify: false,
+
+
+        crop: true,
+
+        preserveHeaders: false,
+
+
+        noCompressIfLarger: false,
+
+
+        compressSize:0
+    }
+    });
+
+    uploader.on( "uploadError",function(){
+    layer.msg("上传失败");
+    });
+
+    uploader.on( "uploadSuccess", function( file,response ) { 
+
+    if(response.code == 1){ 
+
+        layer.msg("成功");
+        
+    }else if(response.code == -1){
+
+       layer.msg(response.msg); 
+    } 
+    });
+
+
+
+ 
+
+layui.use(['jquery','layer'], function(){
+
+   
+    $ = layui.jquery;
+    $("#up").click();
+    
+    
+
+});
+</script>

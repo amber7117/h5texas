@@ -1,0 +1,15 @@
+<?php return array (
+  'id' => '4',
+  'name' => '支付宝',
+  'suoluetu' => '',
+  'payid' => '1000',
+  'paykey' => 'd05899c252e0ece1111a13a9271de612',
+  'zhanghao' => '0',
+  'off' => '1',
+  'xianshi' => '1',
+  'beizhu' => '1',
+  'paixu' => '3',
+  'adminid' => '0',
+  'payfile' => 'zsmianqian',
+  'isapp' => '0',
+);

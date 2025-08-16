@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理后台</title>
+<link rel="stylesheet" href="/layui/css/layui.css">
+<link rel="stylesheet" href="/layui/lay/modules/webuploader.css">
+<style>
+.layui-form{padding-top:10px;}
+span.gg{display:inline-block;padding:0 5px;color:red;background:#fff;border:1px solid #ccc;border-radius:30%;}
+.layui-form-label{width:150px;text-align:left;}
+.layui-bg-b1{background-color: #DDF0ED;}
+.layui-bg-b2{background-color: #376956;}
+.layui-bg-b3{background-color: #C3BED4;}
+.layui-bg-b4{background-color: #C7FFEC;}
+.layui-bg-b5{background-color: #495A80;}
+.layui-bg-b7{background-color: #E9F01D;}
+.layui-bg-b8{background-color: #9966CC;}
+.layui-bg-b9{background-color: #00FF80;}
+.layui-bg-b10{background-color: #FD5B78;}
+.layui-input-block{margin-left:150px;}
+</style>
+
+
+
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div id="view" style="padding:20px;"> 
+    
+        <p style="padding:10px 20px;"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop" style="color:red;">&#xe63d;</i> 加载中...</p>
+    </div>
+
+
+ 
+</div>
+
+
+</body>
+</html>
+<script src="/layui/layui.js"></script>
+<script src="/layui/lay/modules/jquery-3.2.1.min.js"></script>
+<script src="/layui/lay/modules/webuploader.js"></script>
+
+<script>
+QT = 2;
+var MODE = 'dtuiguang';
+var NUM = 8;
+var pg = 1;
+var ID = 0;
+var TYPE;
+  COLOR = Array('layui-bg-red','layui-bg-orange','layui-bg-green','layui-bg-blue','layui-bg-cyan','layui-bg-b1','layui-bg-b2','layui-bg-b3','layui-bg-b4','layui-bg-b5','layui-bg-b6','layui-bg-b7','layui-bg-b8','layui-bg-b9','layui-bg-b10');
+
+layui.config({
+  base: '/layui/lay/modules/'
+});
+
+
+function qtdenglu(){
+    
+    layer.closeAll();
+    window.location.href="user.html";
+
+}
+
+function dbdel(ID){
+
+}
+
+
+function edit(ID){
+
+}
+
+
+function add(ID){
+
+}
+
+
+
+function vwselect(data){
+
+    laytpl = layui.laytpl;
+    element = layui.element();
+    form = layui.form();
+    D=data.data;
+
+    html = '<form class="layui-form" action="">';
+
+    Ren = data.reg;
+    Jin = data.jine
+
+    if(Ren< 1){
+
+        Ren = 1;
+    
+    }
+
+    if(Jin< 1){
+
+        Jin = 1;
+    
+    }
+
+
+
+    for(var m in D){
+
+        html+='<div class="layui-form-item"><div style="float:left;width:180px;"><label class="layui-form-label">'+D[m].time+' 注册</label><br /><label class="layui-form-label">'+D[m].time+' 充值</label></div><div class="layui-input-block">';
+
+        $zhi = D[m].reg/Ren*100;
+
+        html+='<div class="layui-progress layui-progress-big" style="width:90%;top:10px;">';
+        html+='<div class="layui-progress-bar '+COLOR[Math.floor(Math.random()*COLOR.length)]+'" lay-percent="'+$zhi+'%"> <span class="gg"><b>'+D[m].yox+'/</b>'+D[m].reg+'</span></div></div>';
+
+        $zhi = D[m].pay/Jin*100;
+
+        html+='<br /><div class="layui-progress layui-progress-big" style="width:90%;top:10px;">';
+        html+='<div class="layui-progress-bar '+COLOR[Math.floor(Math.random()*COLOR.length)]+'" lay-percent="'+$zhi+'%"><span class="gg">'+D[m].pay+'</span></div></div>';
+
+        html+='</div></div>';
+    }
+
+    html+='</form>';
+   
+
+
+
+    document.getElementById('view').innerHTML = html;
+    element.init();
+
+    form = layui.form();
+    form.render('select'); 
+
+}
+
+
+function dbselect(){
+
+    $.ajax({
+
+        url:USIN,
+        type: "POST",
+        data:{y:MODE,d:"get",num:NUM,pg:pg,apptoken:getCookie("apptoken")},
+        dataType: "json",
+        timeout:"3000",
+        success: function(data){
+
+            if(data.token && data.token != ""){
+            
+                TOKEN = data.token;
+            }
+
+            D = data.data;
+
+            if(data.code == -3){
+
+            
+                parent.layer.closeAll();
+                parent.qtinmain();
+            }
+
+            if(data.code == 1){
+
+                layer.closeAll();
+                vwselect(D);
+
+            }else{
+
+                $("#view").html('没有更多数据');
+                $(".baoqi").hide();
+
+                layer.msg('没有更多数据');
+
+            }
+
+        },error:function(XMLHttpRequest){
+
+            ajaxfan(XMLHttpRequest);
+        }
+
+    });
+}
+
+layui.use(['jquery','laytpl','laypage','layer','form', 'element','laydate'], function(){
+
+    var layer = layui.layer,
+    laydate =layui.laydate,
+    upload =layui.upload,
+    form = layui.form();
+    $ = layui.jquery;
+    var laytpl = layui.laytpl;
+    var laypage = layui.laypage;
+
+    dbselect();
+   
+
+});
+
+</script>
+
+
+
